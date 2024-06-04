@@ -71,4 +71,4 @@ def api_get_cookie():
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
-        app.run(debug=False, port=port)
+        app.run(host='0.0.0.0', port=8080)
