@@ -1,7 +1,7 @@
 import re
 import random
 import string
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 import requests
 import json
 
@@ -43,21 +43,16 @@ def getCookies(uid, password):
     }
     _res = session.post('https://p.facebook.com/login/device-based/login/async/?refsrc=deprecated&lwv=100', data=_data, headers=_header).text
     cookies = session.cookies.get_dict()
-
-    cookies = {"datr": cookies.pop("datr", None), **cookies}
+    cookies = {"datr": cookies.pop("datr", None), **cookies}  
     return cookies
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/login', methods=['GET'])
-def login():
-    data = request.form
-    email = data.get('email')
-    password = data.get('password')
+@app.route('/api/getCookie')
+def get_cookie():
+    email = request.args.get('email')
+    password = request.args.get('password')   
+    if not email or not password:
+        return jsonify({"error": "Email and password are required."}), 400   
     cookies = getCookies(email, password)
-    return jsonify(cookies)
-
+    formatted_cookies = "; ".join([f"{key}={value}" for key, value in cookies.items()])    
+    return formatted_cookies
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
